@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Book;
+use App\Repository\BookRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,38 +15,57 @@ use Symfony\Component\Routing\Annotation\Route;
 class LibraryController extends AbstractController
 {
 
-    private $logger;
 
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger= $logger;
-    }
-    
     /**
-     * @Route("/library/list", name="library_list")
+     * @Route("/books", name="books_get")
      */
-    public function list(Request $request)
+    public function list(Request $request, LoggerInterface $logger, BookRepository $bookRepository)
     {
         $title= $request->get('title', 'Alegria');
-        $this->logger->info('List action called');
+        $books= $bookRepository->findAll();
+
+        $booksAsArray= [];
+        foreach($books as $book){
+            $booksAsArray[]= [
+                'id'=> $book->getId(),
+                'title'=> $book->getTitle(),
+                'image'=> $book->getImage(),
+            ];
+        }
+        $logger->info('Get all Books called');
         $response= new JsonResponse();
         $response->setData([
             'success'=> true,
-            'data' => [
-                [
-                    'id' => 1,
-                    'title' => 'Hacia rutas salvajes'
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'El nombre del viento'
-                ],
-                [
-                    'id' => 3,
-                    'title' => $title
-                ]
-            ]
+            'data' => $booksAsArray
         ]);
+        return $response;
+    }
+
+    /**
+     * @Route("/book/create", name="create_book")
+     */
+    public function createBook(Request $request, EntityManagerInterface $em){
+        $book= new Book();
+        $response= new JsonResponse();
+        $title= $request->get('title', null);
+        if(empty($title)){
+            $response->setData([
+                'success'=> false,
+                'error'=> "Title cannot be empty",
+                'data' => null,
+            ]);
+        }
+        $book->setTitle($title);
+        // $book->setImage('p');
+        $em->persist($book);
+        $em->flush();
+
+        $response->setData([
+            'success'=> true,
+            'error'=> $title,
+            'data' => null,
+        ]);
+
         return $response;
     }
 
