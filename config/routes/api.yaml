@@ -1,0 +1,6 @@
+api: 
+  resource: ../../src/Controller/Api/
+  type: annotation
+  prefix: /api
+  # Todo dentro de la carpeta controller/api sea tratado y considerado con este tipo de rutas
+  # Seran declaradas mediante anotaciones y prefijadas con el prefijo /api

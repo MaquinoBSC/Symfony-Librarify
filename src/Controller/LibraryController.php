@@ -54,6 +54,8 @@ class LibraryController extends AbstractController
                 'error'=> "Title cannot be empty",
                 'data' => null,
             ]);
+
+            return $response;
         }
         $book->setTitle($title);
         // $book->setImage('p');
@@ -62,8 +64,7 @@ class LibraryController extends AbstractController
 
         $response->setData([
             'success'=> true,
-            'error'=> $title,
-            'data' => null,
+            'data'=> $title,
         ]);
 
         return $response;
