@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Book;
+use App\Form\Type\BookFormType;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -28,11 +29,16 @@ class BooksController extends AbstractFOSRestController
     public function postAction(Request $request, EntityManagerInterface $em)
     {
         $book= new Book();
-        $book->setTitle("Installing FOS Rest Bundle");
-        // $book->setImage('p');
-        $em->persist($book);
-        $em->flush();
+        $form= $this->createForm(BookFormType::class, $book);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) { 
+            $em->persist($book);
+            $em->flush();
 
-        return $book;
+            return $book;
+        }
+
+        return $form;
     }
 }
