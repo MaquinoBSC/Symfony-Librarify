@@ -1,0 +1,7 @@
+# config/packages/flysystem.yaml
+flysystem:
+  storages:
+    default.storage:
+      adapter: 'local'
+      options:
+        directory: '%kernel.project_dir%/public/storage/default'
